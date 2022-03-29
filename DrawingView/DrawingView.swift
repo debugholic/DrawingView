@@ -34,13 +34,17 @@ public class DrawingView: UIView {
     
     var strokeColor: UIColor = UIColor.blue.withAlphaComponent(1) {
         didSet {
-            canvas.strokeColor = strokeColor
+            DispatchQueue.main.async { [self] in
+                self.canvas.strokeColor = strokeColor
+            }
         }
     }
     
     var lineWidth: CGFloat = 10 {
         didSet {
-            canvas.lineWidth = lineWidth
+            DispatchQueue.main.async { [self] in
+                self.canvas.lineWidth = lineWidth
+            }
         }
     }
 

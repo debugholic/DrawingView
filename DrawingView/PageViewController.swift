@@ -19,7 +19,7 @@ class PageViewController: UIViewController {
     }
     
     let data = [
-        ("", ""),
+        ("check", ""),
         ("", ""),
         ("", ""),
     ]

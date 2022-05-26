@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import PocketSVG
 
 class ViewController: UIViewController {
     @IBOutlet weak var drawingView: DrawingView! {
@@ -24,12 +25,16 @@ class ViewController: UIViewController {
         if let url = Bundle.main.url(forResource: imageName, withExtension: "svg") {
             let answer = Bundle.main.url(forResource: answerName, withExtension: "svg")
             drawingView.drawPaths(url: url, answers: answer, isDrawInSequence: isDrawInSequence)
+            drawingView.delegate = self
         }
     }
     
     override func willTransition(to newCollection: UITraitCollection, with coordinator: UIViewControllerTransitionCoordinator) {
         coordinator.animate { _ in
-            self.drawingView.clear()
+            if let url = Bundle.main.url(forResource: self.imageName, withExtension: "svg") {
+                let answer = Bundle.main.url(forResource: self.answerName, withExtension: "svg")
+                self.drawingView.drawPaths(url: url, answers: answer, isDrawInSequence: self.isDrawInSequence)
+            }
         }
     }
     
@@ -48,7 +53,12 @@ class ViewController: UIViewController {
 
 extension ViewController: DrawingViewDelegate {
     func drawingViewDidEndDrawing(_ drawingView: DrawingView, at index: Int) {
-        simLabel.text = String(format: "%.1f", drawingView.paths[index].similarity)
+        simLabel.text = String(format: "%.1f", drawingView.paths[index].similarity * 100)
+    }
+    
+    func drawingViewDidDrawPath(_ drawingView: DrawingView, drawPath: SVGBezierPath) {
+        print(drawPath.svgRepresentation)
+        
     }
 }
 

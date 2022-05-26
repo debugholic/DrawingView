@@ -13,13 +13,13 @@ class PageViewController: UIViewController {
 
     var index = 0 {
         didSet {
-            self.nextButton.isHidden = index == self.data.count - 1
-            self.prevButton.isHidden = index == 0
+            nextButton.isHidden = index == data.count - 1
+            prevButton.isHidden = index == 0
         }
     }
     
     let data = [
-        ("check", ""),
+        ("check", "check-answer"),
         ("", ""),
         ("", ""),
     ]
@@ -28,37 +28,37 @@ class PageViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.view.backgroundColor = .white
+        view.backgroundColor = .white
         if let viewController = UIStoryboard(name: "Main", bundle: .main).instantiateViewController(withIdentifier: "Draw") as? ViewController {
-            viewController.imageName = self.data[index].0
-            viewController.answerName = self.data[index].1
-            self.pageViewController?.setViewControllers([viewController], direction: .forward, animated: false)
+            viewController.imageName = data[index].0
+            viewController.answerName = data[index].1
+            pageViewController?.setViewControllers([viewController], direction: .forward, animated: false)
         }
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        self.pageViewController = segue.destination as? UIPageViewController
+        pageViewController = segue.destination as? UIPageViewController
     }
     
     @IBAction func touchUpInside(_ sender: Any) {
         switch sender as? UIButton {
         case nextButton:
-            self.index += 1
+            index += 1
             if let viewController = UIStoryboard(name: "Main", bundle: .main).instantiateViewController(withIdentifier: "Draw") as? ViewController {
-                viewController.imageName = self.data[index].0
-                viewController.answerName = self.data[index].1
+                viewController.imageName = data[index].0
+                viewController.answerName = data[index].1
                 viewController.isDrawInSequence = (index == data.count-1)
-                self.pageViewController?.setViewControllers([viewController], direction: .forward, animated: true)
+                pageViewController?.setViewControllers([viewController], direction: .forward, animated: true)
             }
             break
 
         case prevButton:
             self.index -= 1
             if let viewController = UIStoryboard(name: "Main", bundle: .main).instantiateViewController(withIdentifier: "Draw") as? ViewController {
-                viewController.imageName = self.data[index].0
-                viewController.answerName = self.data[index].1
+                viewController.imageName = data[index].0
+                viewController.answerName = data[index].1
                 viewController.isDrawInSequence = (index == data.count-1)
-                self.pageViewController?.setViewControllers([viewController], direction: .reverse, animated: true)
+                pageViewController?.setViewControllers([viewController], direction: .reverse, animated: true)
             }
             break
 

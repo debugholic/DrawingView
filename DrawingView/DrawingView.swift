@@ -9,6 +9,7 @@ import UIKit
 import PocketSVG
 
 protocol DrawingViewDelegate {
+    func drawingViewDidDrawPath(_ drawingView: DrawingView, drawPath: SVGBezierPath)
     func drawingViewDidEndDrawing(_ drawingView: DrawingView, at index: Int)
 }
 
@@ -206,6 +207,17 @@ extension DrawingView: CanvasDelegate {
                     self.sequence = index + 1
                 }
                 delegate?.drawingViewDidEndDrawing(self, at: index)
+                                
+                let path = SVGBezierPath(rect: CGRect(origin: .zero, size: imageView.frame.size))
+                for point in points {
+                    path.addLine(to: point)
+                }
+                if paths[index].svgPath.viewBox.width > 0 && paths[index].svgPath.viewBox.height > 0 {
+                    let scaleX = paths[index].svgPath.viewBox.width / imageView.frame.width
+                    let scaleY = paths[index].svgPath.viewBox.height / imageView.frame.height
+                    path.apply(CGAffineTransform(scaleX: scaleX, y: scaleY))
+                }
+                delegate?.drawingViewDidDrawPath(self, drawPath: path)
             }
             
             drawPaths(paths)

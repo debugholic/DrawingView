@@ -14,19 +14,19 @@ public protocol CanvasDelegate {
 public class Canvas: UIView {
     private var paths = [[CGPoint]]()
     
-    private lazy var context: CGContext = {
+    private lazy var context: CGContext? = {
         return createContext()
     }()
     
     var strokeColor: UIColor = UIColor.black.withAlphaComponent(1) {
         didSet {
-            context.setStrokeColor(strokeColor.cgColor)
+            context?.setStrokeColor(strokeColor.cgColor)
         }
     }
     
     var lineWidth: CGFloat = 10 {
         didSet {
-            context.setLineWidth(lineWidth)
+            context?.setLineWidth(lineWidth)
         }
     }
     
@@ -48,14 +48,14 @@ public class Canvas: UIView {
         if !paths.isEmpty {
             paths.removeLast()
             for path in paths {
-                context.beginPath()
+                context?.beginPath()
                 var last: CGPoint?
                 for point in path {
-                    context.move(to: point)
+                    context?.move(to: point)
                     if let last = last {
-                        context.addLine(to: last)
-                        context.strokePath()
-                        context.setLineCap(.round)
+                        context?.addLine(to: last)
+                        context?.strokePath()
+                        context?.setLineCap(.round)
                     }
                     last = point
                 }
@@ -65,11 +65,11 @@ public class Canvas: UIView {
         }
     }
     
-    func createContext() -> CGContext {
+    func createContext() -> CGContext? {
         UIGraphicsBeginImageContextWithOptions(bounds.size, false, UIScreen.main.scale)
-        let context = UIGraphicsGetCurrentContext()!
-        context.setStrokeColor(strokeColor.cgColor)
-        context.setLineWidth(lineWidth)
+        let context = UIGraphicsGetCurrentContext()
+        context?.setStrokeColor(strokeColor.cgColor)
+        context?.setLineWidth(lineWidth)
         return context
     }
     
@@ -79,20 +79,20 @@ public class Canvas: UIView {
         
     override public func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         let firstPoint = touches.first!.location(in: self)
-        context.beginPath()
+        context?.beginPath()
         paths.append([CGPoint]())
         paths[paths.count-1].append(firstPoint)
-        context.move(to: firstPoint)
+        context?.move(to: firstPoint)
         last = firstPoint
     }
     
     override public func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
         if let last = last, let point = touches.first?.location(in: self) {
-            context.move(to: last)
+            context?.move(to: last)
             paths[paths.count-1].append(point)
-            context.addLine(to: point)
-            context.strokePath()
-            context.setLineCap(.round)
+            context?.addLine(to: point)
+            context?.strokePath()
+            context?.setLineCap(.round)
             self.last = point
         }
         let image = UIGraphicsGetImageFromCurrentImageContext()
@@ -100,8 +100,10 @@ public class Canvas: UIView {
     }
     
     override public func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-        context.addLines(between: paths[paths.count - 1])
-        delegate?.canvas(self, didDrawWithPoints: paths[paths.count-1], with: context.boundingBoxOfPath)
+        context?.addLines(between: paths[paths.count - 1])
+        if let boundingBoxOfPath = context?.boundingBoxOfPath {
+            delegate?.canvas(self, didDrawWithPoints: paths[paths.count-1], with: boundingBoxOfPath)
+        }
     }
 }
 
